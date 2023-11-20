@@ -11,5 +11,6 @@ namespace Contracts.Model
         public string name { get; set; }
         public string jobTitle { get; set; }
         public int FK_ClientId { get; set; }
+        public string baseDescription { get; set; }
     }
 }

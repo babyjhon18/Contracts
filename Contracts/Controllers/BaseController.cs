@@ -1,5 +1,6 @@
 ﻿using Contracts.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,13 @@ namespace Contracts.Controllers
 {
     public class BaseController : Controller
     {
+        public readonly IConfiguration Configuration;
+
         public DataBaseContext db;
-        public BaseController(DataBaseContext context)
+        public BaseController(DataBaseContext context, IConfiguration configuration)
         {
             db = context;
+            Configuration = configuration;
         }
 
         public object Status(dynamic dataItem)

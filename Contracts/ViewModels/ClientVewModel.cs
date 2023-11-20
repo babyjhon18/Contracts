@@ -24,7 +24,7 @@ namespace Contracts.ViewModels
                 return context.Clients.Where(c => c.id == singleClientData.id).FirstOrDefault();
             if (singleClientData.name != "" && singleClientData.name != null)
             {
-                return context.Clients.Where(c => c.name.Replace(" ", "") ==
+                return context.Clients.Where(c => c.FullName.Replace(" ", "") ==
                     singleClientData.name.Replace(" ", "")).FirstOrDefault();
             }
             return new { Clients = context.Clients };
@@ -47,7 +47,7 @@ namespace Contracts.ViewModels
                 {
                     context.Clients.Add(client);
                     context.SaveChanges();
-                    var createdActId = context.Acts.Max(clid => clid.id);
+                    var createdActId = context.Clients.Max(clid => clid.id);
                     return new KeyValuePair<bool, int>(true, createdActId);
                 }
             }

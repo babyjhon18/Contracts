@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Contracts.Model
 {
@@ -20,5 +15,8 @@ namespace Contracts.Model
         public DbSet<Payments> Payments { get; set; }
         public DbSet<Acts> Acts { get; set; }
         public DbSet<ResponsiblePersons> ResponsiblePersons { get; set; }
+        public DbSet<RPIndel> RPIndel { get; set; }
+        public DbSet<BlackListClient> BlackListCompanies { get; set; }
+        public DbSet<Notifications> Notifications { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Contracts.Model;
 using Contracts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace Contracts.Controllers
     [Route("api/[controller]")]
     public class ResponsibleController : BaseController
     {
-        public ResponsibleController(DataBaseContext context):
-            base(context)
+        public ResponsibleController(DataBaseContext context, IConfiguration Configuration) :
+            base(context, Configuration)
         {
         }
         
@@ -24,9 +25,15 @@ namespace Contracts.Controllers
         }
 
         [HttpPost]
-        public Object CreateResponsiblePerson([FromBody] Object dataItem)
+        public Object CreateResponsiblePerson([FromBody] Object dataItem, int responsiblePersonId)
         {
-            return Status(new ResponsibleViewModel(db).CreatePerson(dataItem));
+            return Status(new ResponsibleViewModel(db).CreatePerson(dataItem, responsiblePersonId));
+        }
+
+        [HttpDelete]
+        public void Delete(int responsiblePersonId)
+        {
+            Status(new ResponsibleViewModel(db).DeleteResponsiblePerson(responsiblePersonId));
         }
     }
 }

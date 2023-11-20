@@ -1,6 +1,7 @@
 ﻿using Contracts.Model;
 using Contracts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,15 @@ namespace Contracts.Controllers
     [Route("api/[controller]")]
     public class ContractsController : BaseController
     {
-        public ContractsController(DataBaseContext context) :
-            base(context)
+        public ContractsController(DataBaseContext context, IConfiguration Configuration) :
+            base(context, Configuration)
         {
         }
 
         [HttpGet]
-        public Object Get(bool isReadyForAssemble = false)
+        public Object Get(int contractsType = 0)
         {
-            return Status(new ContractsViewModel(db).GetContracts(isReadyForAssemble));
+            return Status(new ContractsViewModel(db).GetContracts(contractsType));
         } 
 
         [HttpPost]

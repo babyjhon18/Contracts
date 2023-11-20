@@ -16,11 +16,12 @@ namespace Contracts.Model
         public string CheckingAccount { get; set; }
         public string Bank { get; set; }
         public string BIC { get; set; }
-        //-----------------------------
         public string UNP { get; set; }
         public string OKPO { get; set; }
+        //-----------------------------
         public string Phones { get; set; }
         public string Email { get; set; }
         public string StorageAddress { get; set; }
+        public bool IsIndividualEnterprise { get; set; }
     }
 }

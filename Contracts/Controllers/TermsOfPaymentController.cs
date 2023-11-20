@@ -1,6 +1,7 @@
 ﻿using Contracts.Model;
 using Contracts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Contracts.Controllers
@@ -9,8 +10,8 @@ namespace Contracts.Controllers
     [Route("api/[controller]")]
     public class TermsOfPaymentController : BaseController
     {
-        public TermsOfPaymentController(DataBaseContext context):
-            base(context)
+        public TermsOfPaymentController(DataBaseContext context, IConfiguration Configuration):
+            base(context, Configuration)
         {
         }
 

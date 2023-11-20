@@ -57,8 +57,8 @@ namespace Contracts.ViewModels
             {
                 context.Entry(dataItem).State = EntityState.Modified;
                 context.SaveChanges();
-                int editedPaymentId = context.Payments.Where(p => p.Id == dataItem.Id).FirstOrDefault().Id;
-                return new KeyValuePair<bool, int>(true, editedPaymentId);
+                    int editedPaymentId = context.Payments.Where(p => p.Id == dataItem.Id).FirstOrDefault().Id;
+                    return new KeyValuePair<bool, int>(true, editedPaymentId);
             }
             catch
             {

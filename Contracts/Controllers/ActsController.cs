@@ -1,6 +1,7 @@
 ﻿using Contracts.Model;
 using Contracts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace Contracts.Controllers
     [Route("api/[controller]")]
     public class ActsController : BaseController
     {
-        public ActsController(DataBaseContext context) :
-            base(context)
+        public ActsController(DataBaseContext context, IConfiguration Configuration) :
+            base(context, Configuration)
         {
         }
 

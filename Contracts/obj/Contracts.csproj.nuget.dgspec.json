@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\ContractsV2\\Contracts\\Contracts.csproj": {}
+    "C:\\Projects\\Contracts\\Contracts\\Contracts.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\ContractsV2\\Contracts\\Contracts.csproj": {
+    "C:\\Projects\\Contracts\\Contracts\\Contracts.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\ContractsV2\\Contracts\\Contracts.csproj",
+        "projectUniqueName": "C:\\Projects\\Contracts\\Contracts\\Contracts.csproj",
         "projectName": "Contracts",
-        "projectPath": "D:\\Projects\\ContractsV2\\Contracts\\Contracts.csproj",
-        "packagesPath": "C:\\Users\\lolki\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\ContractsV2\\Contracts\\obj\\",
+        "projectPath": "C:\\Projects\\Contracts\\Contracts\\Contracts.csproj",
+        "packagesPath": "C:\\Users\\babyjhon18\\.nuget\\packages\\",
+        "outputPath": "C:\\Projects\\Contracts\\Contracts\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\lolki\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\babyjhon18\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -46,6 +44,22 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
+            "EasyDox": {
+              "target": "Package",
+              "version": "[2.0.39, )"
+            },
+            "EasyDox.Morpher": {
+              "target": "Package",
+              "version": "[2.0.30, )"
+            },
+            "FreeSpire.Doc": {
+              "target": "Package",
+              "version": "[11.6.0, )"
+            },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -53,6 +67,18 @@
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "SkiaSharp": {
+              "target": "Package",
+              "version": "[2.88.6, )"
+            },
+            "System.IO.FileSystem": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IO.Packaging": {
+              "target": "Package",
+              "version": "[4.7.0, )"
             }
           },
           "imports": [
@@ -61,7 +87,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -73,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.408\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }

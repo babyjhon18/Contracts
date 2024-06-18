@@ -2,10 +2,6 @@
 using Contracts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using MailKit.Net.Smtp;
-using MimeKit;
-using MailKit.Security;
-using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 
 namespace Contracts.Controllers
@@ -37,6 +33,18 @@ namespace Contracts.Controllers
             Status(new DictionaryViewModel(db, Configuration).DeleteRP(RPID));
         }
 
+        [HttpPost]
+        public Object CreateBank([FromBody] Object dataItem, int BID = 0)
+        {
+            return Status(new ClientVewModel(db).CreateNewBank(dataItem, BID));
+        }
+
+        [HttpDelete]
+        public void DeleteBank(int BID)
+        {
+            Status(new ClientVewModel(db).DeleteBank(BID));
+        }
+
         [HttpGet]
         public IActionResult GetTemplate()
         {
@@ -45,9 +53,9 @@ namespace Contracts.Controllers
         }
 
         [HttpPost]
-        public void SendEmail([FromBody] Object dataItem)
+        public Object SendEmail([FromBody] Object dataItem)
         {
-            Status(new DictionaryViewModel(db, Configuration).EmailSending(dataItem));
+            return Status(new DictionaryViewModel(db, Configuration).EmailSending(dataItem));
         }
     }
 }

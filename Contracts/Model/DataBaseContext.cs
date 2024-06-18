@@ -18,5 +18,6 @@ namespace Contracts.Model
         public DbSet<RPIndel> RPIndel { get; set; }
         public DbSet<BlackListClient> BlackListCompanies { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
+        public DbSet<Banks> Banks { get; set; }
     }
 }

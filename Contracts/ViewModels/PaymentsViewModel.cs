@@ -40,6 +40,13 @@ namespace Contracts.ViewModels
                 else
                 {
                     context.Payments.Add(payment);
+                    var contract = context.Contracts.Where(c => c.id == payment.FK_ContractId).FirstOrDefault();
+                    if(contract.IsPaid == false && contract.NotForWorkPlan == true)
+                    {
+                        contract.IsPaid = true;
+                        contract.ReadyMark = true;
+                        context.Entry(contract).State = EntityState.Modified;
+                    }
                     context.SaveChanges();
                     int createdPaymentId = context.Payments.Max(pid => pid.Id);
                     return new KeyValuePair<bool, int>(true, createdPaymentId);

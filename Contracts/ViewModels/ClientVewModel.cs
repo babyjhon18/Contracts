@@ -1,6 +1,7 @@
 ﻿using Contracts.JSONViewModels;
 using Contracts.Model;
 using Microsoft.EntityFrameworkCore;
+using Morpher.WebService.V2;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,14 +21,30 @@ namespace Contracts.ViewModels
         public Object GetClients(Object client = null)
         {
             var singleClientData = JsonConvert.DeserializeObject<JSONSingleClientModel>(client.ToString());
+            var clientData = new Object();
             if (singleClientData.id != 0)
-                return context.Clients.Where(c => c.id == singleClientData.id).FirstOrDefault();
+            {
+
+                var Client = context.Clients.Where(c => c.id == singleClientData.id).FirstOrDefault();
+                clientData = new
+                {
+                    Client = Client,
+                    BankInfo = context.Banks.Where(b => b.FK_ClientId == Client.id)
+                };
+                return clientData;
+            }
             if (singleClientData.name != "" && singleClientData.name != null)
             {
-                return context.Clients.Where(c => c.FullName.Replace(" ", "") ==
-                    singleClientData.name.Replace(" ", "")).FirstOrDefault();
+                var Client = context.Clients.Where(c => c.FullName.Replace(" ", "") ==
+                        singleClientData.name.Replace(" ", "")).FirstOrDefault();
+                clientData = new
+                {
+                    Client = Client,
+                    BankInfo = context.Banks.Where(b => b.FK_ClientId == Client.id)
+                };
+                return clientData;
             }
-            return new { Clients = context.Clients };
+            return new { Clients = context.Clients, Banks = context.Banks };
         }
 
         public KeyValuePair<bool, int> CreateClient(Object dataItem, int clientId)
@@ -68,6 +85,63 @@ namespace Contracts.ViewModels
             catch
             {
                 return new KeyValuePair<bool, int>(false, 0);
+            }
+        }
+
+        //Bank
+        public KeyValuePair<bool, int> CreateNewBank(Object dataItem, int bankId)
+        {
+            try
+            {
+                Banks bank = JsonConvert.DeserializeObject<Banks>(dataItem.ToString());
+                if (bankId != 0 && bank.Id != 0)
+                {
+                    return UpdateBank(bank);
+                }
+                else if ((bankId != 0 && bank.Id == 0) || (bankId == 0 && bank.Id != 0))
+                {
+                    return new KeyValuePair<bool, int>(false, 0);
+                }
+                else
+                {
+                    context.Banks.Add(bank);
+                    context.SaveChanges();
+                    var createdActId = context.Banks.Max(bid => bid.Id);
+                    return new KeyValuePair<bool, int>(true, createdActId);
+                }
+            }
+            catch
+            {
+                return new KeyValuePair<bool, int>(false, 0);
+            }
+        }
+
+
+        public KeyValuePair<bool, int> UpdateBank(Banks bank)
+        {
+            try
+            {
+                context.Entry(bank).State = EntityState.Modified;
+                context.SaveChanges();
+                return new KeyValuePair<bool, int>(true, bank.Id);
+            }
+            catch
+            {
+                return new KeyValuePair<bool, int>(false, 0);
+            }
+        }
+
+        public bool DeleteBank(int bankId)
+        {
+            try
+            {
+                context.Entry(context.Banks.Where(b => b.Id == bankId).FirstOrDefault()).State = EntityState.Deleted;
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

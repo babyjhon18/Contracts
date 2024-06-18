@@ -40,6 +40,14 @@ namespace Contracts.ViewModels
                 else
                 {
                     context.Acts.Add(act);
+                    var contract = context.Contracts.Where(c => c.id == act.FK_ContractId).FirstOrDefault();
+                    if (contract.IsPaid == false && contract.NotForWorkPlan == true)
+                    {
+                        contract.IsPaid = true;
+                        contract.ReadyMark = true;
+                    }
+                    contract.LastActDate = act.ActDate;
+                    context.Entry(contract).State = EntityState.Modified;
                     context.SaveChanges();
                     var createdActId = context.Acts.Max(aid => aid.id);
                     return new KeyValuePair<bool, int>(true, createdActId);
@@ -55,6 +63,9 @@ namespace Contracts.ViewModels
         {
             try
             {
+                var contract = context.Contracts.Where(c => c.id == act.FK_ContractId).FirstOrDefault();
+                contract.LastActDate = act.ActDate;
+                context.Entry(contract).State = EntityState.Modified;
                 context.Entry(act).State = EntityState.Modified;
                 context.SaveChanges();
                 return new KeyValuePair<bool, int>(true, act.id);

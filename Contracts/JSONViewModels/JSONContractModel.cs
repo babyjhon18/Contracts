@@ -11,7 +11,7 @@ namespace Contracts.JSONViewModels
         public string ContractNumber { get; set; }
         public string ContractDate { get; set; }
         public string ClientName { get; set; }
-        public double Amount { get; set; }
+        public object Amount { get; set; }
         public int PaymentPercent { get; set; }
         public string TermsOfPaymentName { get; set; }
         public bool SignatureMark { get; set; }
@@ -25,5 +25,12 @@ namespace Contracts.JSONViewModels
         public string SignDate { get; set; }
         public string ManufacturingLeadNotes { get; set; }
         public string ManufacturingLeadNoteColor { get; set; }
+        public bool NotForWorkPlan { get; set; }
+        public int PaymentDelay { get; set; }
+        public string PaymentDelayDayType { get; set; }
+        public DateTime LastActDate { get; set; }
+        public string ContractAcceptedBy { get; set; }
+        public bool SawContract { get; set; }
+        public DateTime DayToPlan { get; set; }
     }
 }

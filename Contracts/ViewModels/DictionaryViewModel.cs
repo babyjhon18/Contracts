@@ -103,7 +103,7 @@ namespace Contracts.ViewModels
                 JSONNotificationModel Notification = JsonConvert.DeserializeObject<JSONNotificationModel>(dataItem.ToString());
                 Clients currentClient = context.Clients.Where(c => c.id == Notification.ClientId).FirstOrDefault();
                 Model.Contracts currentContract = context.Contracts
-                    .Where(c => c.id == Notification.ContractId && c.ReadyMark == true).FirstOrDefault();
+                    .Where(c => c.id == Notification.ContractId).FirstOrDefault();
                 var engine = new Engine();
                 Document document = new Document();
                 var fieldValues = new Dictionary<string, string>();
@@ -162,15 +162,16 @@ namespace Contracts.ViewModels
                 if(currentClient.Email != null && currentClient.Email != "")
                 {
                     emailMessage.From.Add(new MailboxAddress("ЗАО «ИнДелКо»", _Configuration.GetValue("IndelEmailAddress", "")));
-                    emailMessage.To.Add(new MailboxAddress("Roman", _Configuration.GetValue("DeputyAccountantEmail", "")));
-                    builder.Attachments.Add(url + AttachmentName + currentContract.ContractNumber.Replace("/", "_") + ".docx");
+                    //_Configuration.GetValue("DeputyAccountantEmail", "")
+                    emailMessage.To.Add(new MailboxAddress(currentClient.name, currentClient.Email));
+                    builder.Attachments.Add(url + AttachmentName + currentContract.ContractNumber.Replace("/", "_") + ".pdf");
                 }
                 else
                 {
                     emailMessage.From.Add(new MailboxAddress("ЗАО «ИнДелКо»", _Configuration.GetValue("IndelEmailAddress", "")));
-                    emailMessage.To.Add(new MailboxAddress("Roman", _Configuration.GetValue("DeputyAccountantEmailV2", "")));
+                    emailMessage.To.Add(new MailboxAddress("Galina", _Configuration.GetValue("DeputyAccountantEmail", "")));
                     //emailMessage.To.Add(new MailboxAddress(currentClient.FullName, currentClient.Email));
-                    builder.Attachments.Add(url + AttachmentName + currentContract.ContractNumber.Replace("/", "_") + ".pdf");
+                    builder.Attachments.Add(url + AttachmentName + currentContract.ContractNumber.Replace("/", "_") + ".docx");
                 }
                 emailMessage.Subject = "Готовность оборудования";
                 emailMessage.Body = builder.ToMessageBody();

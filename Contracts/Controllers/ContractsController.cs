@@ -29,5 +29,11 @@ namespace Contracts.Controllers
         {
             return Status(new ContractsViewModel(db).CreateContract(dataItem, contractID));
         }
+
+        [HttpDelete]
+        public void Delete(int contractId)
+        {
+            Status(new ContractsViewModel(db).DeleteContract(contractId));
+        }
     }
 }

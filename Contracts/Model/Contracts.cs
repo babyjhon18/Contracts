@@ -24,5 +24,13 @@ namespace Contracts.Model
         public DateTime SignDate { get; set; }
         public string ManufacturingLeadNotes { get; set; }
         public string ManufacturingLeadNoteColor { get; set; }
+        public bool NotForWorkPlan { get; set; }
+        public bool IsPaid { get; set;}
+        public int PaymentDelay { get; set; }
+        public string PaymentDelayDayType { get; set; }
+        public DateTime LastActDate { get; set; }
+        public string ContractAcceptedBy { get; set; }
+        public bool SawContract { get; set; }
+        public DateTime DayToPlan { get; set; }
     }
 }

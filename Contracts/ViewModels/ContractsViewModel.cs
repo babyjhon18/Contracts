@@ -1,7 +1,9 @@
 ﻿using Contracts.JSONViewModels;
 using Contracts.Model;
 using Microsoft.EntityFrameworkCore;
+using Morpher.WebService.V2;
 using Newtonsoft.Json;
+using Spire.Doc.Fields;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -23,6 +25,7 @@ namespace Contracts.ViewModels
             Object ContractsData = new Object();
             switch (contractsType)
             {
+                //Реестр
                 case 0:
                     foreach (var contract in context.Contracts)
                     {
@@ -35,6 +38,7 @@ namespace Contracts.ViewModels
                         ContractsList.Add(Contract);
                     }
                     break;
+                //План работ
                 case 1:
                     foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true && c.ReadyMark == false))
                     {
@@ -44,9 +48,10 @@ namespace Contracts.ViewModels
                             Payments = context.Payments.Where(p => p.FK_ContractId == contract.id),
                             Acts = context.Acts.Where(p => p.FK_ContractId == contract.id),
                         };
-                        ContractsList.Add(Contract);
+                        if(Contract.Contract.NotForWorkPlan == false) ContractsList.Add(Contract);
                     }
                     break;
+                //Неоплаченные
                 case 2:
                     foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true && c.ReadyMark == true))
                     {
@@ -56,12 +61,20 @@ namespace Contracts.ViewModels
                             Payments = context.Payments.Where(p => p.FK_ContractId == contract.id),
                             Acts = context.Acts.Where(p => p.FK_ContractId == contract.id),
                         };
-                        if (CheckIfNotFullPayment(Contract.Contract, Contract.Acts.ToList(), Contract.Payments.ToList()))
-                        {
-                            ContractsList.Add(Contract);
-                        }
+                        FullPayments payments = CountPayment(Contract.Acts, Contract.Payments);
+                        if (CheckIfNotFullPayment(Contract.Contract, Contract.Acts.ToList(), Contract.Payments.ToList()) && 
+                            Contract.Contract.NotForWorkPlan == false && 
+                            payments.PaymentsSum < payments.ActsSum && 
+                            (payments.ActsSum > 0 || payments.ActsSum == Contract.Contract.Amount)) ContractsList.Add(Contract);
+                        if (Contract.Contract.NotForWorkPlan == true &&
+                            payments.ActsSum == Contract.Contract.Amount &&
+                            payments.PaymentsSum < payments.ActsSum &&
+                            payments.PaymentsSum < Contract.Contract.Amount &&
+                            payments.PaymentsSum != 0
+                            ) ContractsList.Add(Contract);
                     }
                     break;
+                //Архив
                 case 3:
                     foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true && c.ReadyMark == true))
                     {
@@ -71,14 +84,12 @@ namespace Contracts.ViewModels
                             Payments = context.Payments.Where(p => p.FK_ContractId == contract.id),
                             Acts = context.Acts.Where(p => p.FK_ContractId == contract.id),
                         };
-                        if (CheckIfFullPayment(Contract.Contract, Contract.Acts.ToList(), Contract.Payments.ToList()))
-                        {
-                            ContractsList.Add(Contract);
-                        }
+                        if (CheckIfFullPayment(Contract.Contract, Contract.Acts.ToList(), Contract.Payments.ToList())) ContractsList.Add(Contract);
                     }
                     break;
+                //Готовые
                 case 4:
-                    foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true && c.ReadyMark == true))
+                    foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true))
                     {
                         var Contract = new
                         {
@@ -86,8 +97,40 @@ namespace Contracts.ViewModels
                             Payments = context.Payments.Where(p => p.FK_ContractId == contract.id),
                             Acts = context.Acts.Where(p => p.FK_ContractId == contract.id),
                         };
-                        if(CheckIfPaymentExists(Contract.Contract, Contract.Acts.ToList(), Contract.Payments.ToList()))
-                            ContractsList.Add(Contract);
+
+                        if (Contract.Contract.NotForWorkPlan == false && Contract.Contract.ReadyMark == true)
+                        {
+                            var fullPayments = CountPayment(Contract.Acts.ToList(), Contract.Payments.ToList());
+                            if (fullPayments.ActsSum != Contract.Contract.Amount && 
+                                fullPayments.PaymentsSum <= Contract.Contract.Amount
+                                )
+                                ContractsList.Add(Contract);
+                        }
+                        FullPayments payments = CountPayment(Contract.Acts, Contract.Payments);
+                        if (Contract.Contract.NotForWorkPlan == true &&
+                            Contract.Payments.Count() > 0 &&
+                            Contract.Contract.TermsOfPaymentId != 3 &&
+                            Contract.Contract.Amount != payments.ActsSum && 
+                            Contract.Contract.Amount >= payments.PaymentsSum) { 
+                            ContractsList.Add(Contract); }
+                        else if (Contract.Contract.NotForWorkPlan == true &&
+                            Contract.Contract.TermsOfPaymentId == 3 &&
+                            ((Contract.Acts.Count() == 0 &&
+                            Contract.Payments.Count() == 0) ||
+                            Contract.Contract.Amount != payments.ActsSum)) { ContractsList.Add(Contract); }
+                    }
+                    break;
+                //ПНР
+                case 5:
+                    foreach (var contract in context.Contracts.Where(c => c.SignatureMark == true && c.ReadyMark == false && c.NotForWorkPlan == true))
+                    {
+                        var Contract = new
+                        {
+                            Contract = contract,
+                            Payments = context.Payments.Where(p => p.FK_ContractId == contract.id),
+                            Acts = context.Acts.Where(p => p.FK_ContractId == contract.id),
+                        };
+                        ContractsList.Add(Contract);
                     }
                     break;
             }
@@ -101,7 +144,7 @@ namespace Contracts.ViewModels
             return ContractsData;
         }
 
-        private Object CountPayment(IEnumerable<Acts> Acts, IEnumerable<Payments> Payments)
+        private FullPayments CountPayment(IEnumerable<Acts> Acts, IEnumerable<Payments> Payments)
         {
             double ActsSum = 0;
             double PaymentsSum = 0;
@@ -127,24 +170,16 @@ namespace Contracts.ViewModels
                 else
                     return false;
             }
-            return true;
+            return false;
         }
 
         private bool CheckIfNotFullPayment(Model.Contracts Contract, List<Acts> Acts, List<Payments> Payments)
         {
-            if (Acts.Count() != 0 && Payments.Count() != 0)
-            {
-                var FullPayments = CountPayment(Acts, Payments) as FullPayments;
-                if (FullPayments.PaymentsSum != Contract.Amount)
-                {
-                    return true;
-                }
-            }
-            else
-            {
+            var FullPayments = CountPayment(Acts, Payments);
+            if (FullPayments.PaymentsSum < Contract.Amount)
                 return true;
-            }
-            return false;
+            else
+                return false;
         }
 
         private bool CheckIfFullPayment(Model.Contracts Contract, List<Acts> Acts, List<Payments> Payments)
@@ -154,7 +189,7 @@ namespace Contracts.ViewModels
                 if (Acts.Count() != 0 && Payments.Count() != 0)
                 {
                     var FullPayments = CountPayment(Acts, Payments) as FullPayments;
-                    if (FullPayments.ActsSum == FullPayments.PaymentsSum && FullPayments.ActsSum == Contract.Amount && FullPayments.PaymentsSum == Contract.Amount)
+                    if (FullPayments.ActsSum <= FullPayments.PaymentsSum && FullPayments.ActsSum == Contract.Amount && FullPayments.PaymentsSum >= Contract.Amount)
                     {
                         return true;
                     }
@@ -169,6 +204,7 @@ namespace Contracts.ViewModels
             {
                 JSONContractModel jsonContract = JsonConvert.DeserializeObject<JSONContractModel>(dataItem.ToString());
                 var client = context.Clients.Where(c => c.FullName == jsonContract.ClientName).FirstOrDefault();
+                var existedContract = context.Contracts.Where(ct => ct.id == jsonContract.id).FirstOrDefault();
                 if (client == null)
                 {
                     context.Clients.Add(new Clients() { name = jsonContract.ClientName });
@@ -176,8 +212,7 @@ namespace Contracts.ViewModels
                 }
                 Model.Contracts contract = new Model.Contracts()
                 {
-                    id = jsonContract.id,
-                    Amount = jsonContract.Amount,
+                    Amount = Convert.ToDouble(jsonContract.Amount),
                     Percent = jsonContract.PaymentPercent,
                     ClientId = context.Clients.Where(c =>
                         c.FullName == jsonContract.ClientName).FirstOrDefault().id,
@@ -189,19 +224,57 @@ namespace Contracts.ViewModels
                     Description = jsonContract.Description,
                     ReadyComment = jsonContract.ReadyComment,
                     OurDelivery = jsonContract.OurDelivery,
-                    ReadyMark = jsonContract.ReadyMark,
-                    SignatureMark = jsonContract.SignatureMark,
                     TermsOfPaymentId = context.TermsOfPayment.Where(top =>
                         top.name == jsonContract.TermsOfPaymentName).FirstOrDefault().id,
                     Comment = jsonContract.Comment,
                     HTMLSpecification = jsonContract.HTMLSpecification,
-                    SignDate = Convert.ToDateTime(jsonContract.SignDate),
                     ManufacturingLeadNotes = jsonContract.ManufacturingLeadNotes,
                     ManufacturingLeadNoteColor = jsonContract.ManufacturingLeadNoteColor,
+                    NotForWorkPlan = jsonContract.NotForWorkPlan,
+                    PaymentDelay= jsonContract.PaymentDelay,
+                    PaymentDelayDayType= jsonContract.PaymentDelayDayType,
+                    ContractAcceptedBy = jsonContract.ContractAcceptedBy,
+                    SignDate = Convert.ToDateTime(jsonContract.SignDate),
+                    ReadyMark = jsonContract.ReadyMark,
+                    SignatureMark = jsonContract.SignatureMark,
+                    SawContract = jsonContract.SawContract,
                 };
-                if (contractID != 0 && contract.id != 0)
+                if (contractID != 0 && jsonContract.id != 0)
                 {
-                    return UpdateContract(contract);
+                    existedContract.Amount = Convert.ToDouble(jsonContract.Amount);
+                    existedContract.Percent = jsonContract.PaymentPercent;
+                    existedContract.ClientId = context.Clients.Where(c =>
+                        c.FullName == jsonContract.ClientName).FirstOrDefault().id;
+                    existedContract.ContractDate = Convert.ToDateTime(jsonContract.ContractDate);
+                    existedContract.ContractNumber = jsonContract.ContractNumber;
+                    existedContract.DeadLine = jsonContract.DeadLine;
+                    existedContract.DeadLineDayType = jsonContract.DeadLineDayType;
+                    existedContract.DeadLineDaySetted = jsonContract.DeadLineDaySetted;
+                    existedContract.Description = jsonContract.Description;
+                    existedContract.ReadyComment = jsonContract.ReadyComment;
+                    existedContract.OurDelivery = jsonContract.OurDelivery;
+                    existedContract.TermsOfPaymentId = context.TermsOfPayment.Where(top =>
+                        top.name == jsonContract.TermsOfPaymentName).FirstOrDefault().id;
+                    existedContract.Comment = jsonContract.Comment;
+                    existedContract.HTMLSpecification = jsonContract.HTMLSpecification;
+                    existedContract.ManufacturingLeadNotes = jsonContract.ManufacturingLeadNotes;
+                    existedContract.ManufacturingLeadNoteColor = jsonContract.ManufacturingLeadNoteColor;
+                    existedContract.NotForWorkPlan = jsonContract.NotForWorkPlan;
+                    existedContract.PaymentDelay = jsonContract.PaymentDelay;
+                    existedContract.PaymentDelayDayType = jsonContract.PaymentDelayDayType;
+                    existedContract.ContractAcceptedBy = jsonContract.ContractAcceptedBy;
+                    if (existedContract.SignatureMark)
+                    {
+                        existedContract.DayToPlan = DateTime.Now;
+                    }
+                    if (jsonContract.SignDate != "" && jsonContract.SignDate != null)
+                    {
+                        existedContract.SignDate = Convert.ToDateTime(jsonContract.SignDate);
+                        existedContract.ReadyMark = jsonContract.ReadyMark;
+                        existedContract.SignatureMark = jsonContract.SignatureMark;
+                        existedContract.SawContract = jsonContract.SawContract;
+                    }
+                    return UpdateContract(existedContract);
                 }
                 else if ((contractID != 0 && contract.id == 0) || (contractID == 0 && contract.id != 0))
                 {
@@ -230,9 +303,23 @@ namespace Contracts.ViewModels
                 context.SaveChanges();
                 return new KeyValuePair<bool, int>(true, contracts.id);
             }
-            catch
+            catch(Exception ex)
             {
                 return new KeyValuePair<bool, int>(false, 0);
+            }
+        }
+
+        public bool DeleteContract(int contractId)
+        {
+            try
+            {
+                context.Entry(context.Contracts.Where(c => c.id == contractId).FirstOrDefault()).State = EntityState.Deleted;
+                context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

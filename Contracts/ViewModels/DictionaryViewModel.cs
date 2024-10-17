@@ -115,11 +115,11 @@ namespace Contracts.ViewModels
                 {
                     {
                         //"Сегодняшняя дата"
-                        "CurrentD", DateTime.UtcNow.ToString("D")
+                        "CurrentDate", DateTime.UtcNow.ToString("D")
                     },
                     {
                         //"Текущий номер уведомления"
-                        "CurrentN", notificationNumber
+                        "CurrentNotifNumber", notificationNumber
                     },
                     {
                         //"Наименование клиента сокращенно"
@@ -145,7 +145,7 @@ namespace Contracts.ViewModels
                     },
                     {
                         //"Дата ЗАКЛЮЧЕНИЯ договора"
-                        "ContractD", currentContract.ContractDate.ToString("d")
+                        "ContractDate", currentContract.ContractDate.ToString("d")
                     },
                 };
                 var url = AppDomain.CurrentDomain.BaseDirectory + "App_Data\\";

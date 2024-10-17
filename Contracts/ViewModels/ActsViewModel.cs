@@ -46,7 +46,10 @@ namespace Contracts.ViewModels
                         contract.IsPaid = true;
                         contract.ReadyMark = true;
                     }
+                    context.SaveChanges();
                     contract.LastActDate = act.ActDate;
+                    if (GetActsByContract(contract))
+                        contract.ReadyMark = true;
                     context.Entry(contract).State = EntityState.Modified;
                     context.SaveChanges();
                     var createdActId = context.Acts.Max(aid => aid.id);
@@ -59,14 +62,30 @@ namespace Contracts.ViewModels
             }
         }
 
+        private bool GetActsByContract(Model.Contracts contracts)
+        {
+            var actsList = context.Acts.Where(a => a.FK_ContractId == contracts.id);
+            double actsSum = 0;
+            foreach (var act in actsList)
+            {
+                actsSum += act.ActPayment;
+            }
+            if (contracts.Amount <= actsSum)
+                return true;
+            return false;
+        }
+
         public KeyValuePair<bool, int> UpdateAct(Acts act)
         {
             try
             {
                 var contract = context.Contracts.Where(c => c.id == act.FK_ContractId).FirstOrDefault();
                 contract.LastActDate = act.ActDate;
-                context.Entry(contract).State = EntityState.Modified;
                 context.Entry(act).State = EntityState.Modified;
+                context.SaveChanges();
+                if (GetActsByContract(contract))
+                    contract.ReadyMark = true;
+                context.Entry(contract).State = EntityState.Modified;
                 context.SaveChanges();
                 return new KeyValuePair<bool, int>(true, act.id);
             }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Contracts.Controllers
@@ -31,11 +32,17 @@ namespace Contracts.Controllers
                         Response.StatusCode = 200;
                         return keyValue.Value;
                     }
+                    else if (!keyValue.Key && keyValue.Value == 2)
+                    {
+                        Response.StatusCode = 409;
+                        return new EmptyResult();
+                    }
                     else
                     {
                         Response.StatusCode = 304;
                         return new EmptyResult();
                     }
+                    
                 }
             }
             catch

@@ -19,5 +19,6 @@ namespace Contracts.Model
         public DbSet<BlackListClient> BlackListCompanies { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
         public DbSet<Banks> Banks { get; set; }
+        public DbSet<TechnicalConditions> TechnicalConditions { get; set; }
     }
 }

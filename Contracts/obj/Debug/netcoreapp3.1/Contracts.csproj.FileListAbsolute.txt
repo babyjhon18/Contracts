@@ -213,3 +213,4 @@ C:\Projects\Contracts\Contracts\bin\Debug\netcoreapp3.1\runtimes\win-arm64\nativ
 C:\Projects\Contracts\Contracts\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\libSkiaSharp.dll
 C:\Projects\Contracts\Contracts\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\libSkiaSharp.dll
 C:\Projects\Contracts\Contracts\obj\Debug\netcoreapp3.1\Contracts.csproj.Up2Date
+C:\Projects\Contracts\Contracts\obj\Debug\netcoreapp3.1\Contracts.sourcelink.json

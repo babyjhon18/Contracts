@@ -54,7 +54,25 @@ namespace Contracts.ViewModels
                 Clients client = JsonConvert.DeserializeObject<Clients>(dataItem.ToString());
                 if (clientId != 0 && client.id != 0)
                 {
-                    return UpdateClient(client);
+                    var ifClientExists = context.Clients.Where(c => c.FullName == client.FullName || c.name == client.name).FirstOrDefault();
+                    if (ifClientExists.id == client.id)
+                    {
+                        ifClientExists.UNP = client.UNP;
+                        ifClientExists.Phones = client.Phones;
+                        ifClientExists.Email = client.Email;
+                        ifClientExists.FullName = client.FullName;
+                        ifClientExists.OKPO = client.OKPO;
+                        ifClientExists.IsIndividualEnterprise = client.IsIndividualEnterprise;
+                        ifClientExists.LegalAddress = client.LegalAddress;
+                        ifClientExists.PostAddress = client.PostAddress;    
+                        ifClientExists.StorageAddress = client.StorageAddress;  
+                        ifClientExists.name = client.name;
+                        return UpdateClient(ifClientExists);
+                    }
+                    else
+                    {
+                        return new KeyValuePair<bool, int>(false, 2);
+                    }
                 }
                 else if ((clientId != 0 && client.id == 0) || (clientId == 0 && client.id != 0))
                 {
@@ -62,10 +80,18 @@ namespace Contracts.ViewModels
                 }
                 else
                 {
-                    context.Clients.Add(client);
-                    context.SaveChanges();
-                    var createdActId = context.Clients.Max(clid => clid.id);
-                    return new KeyValuePair<bool, int>(true, createdActId);
+                    var ifClientExists = context.Clients.Where(c => c.FullName == client.FullName || c.name == client.name).FirstOrDefault();
+                    if (ifClientExists == null)
+                    {
+                        context.Clients.Add(client);
+                        context.SaveChanges();
+                        var createdActId = context.Clients.Max(clid => clid.id);
+                        return new KeyValuePair<bool, int>(true, createdActId);
+                    }
+                    else
+                    {
+                        return new KeyValuePair<bool, int>(false, 2);
+                    }
                 }
             }
             catch

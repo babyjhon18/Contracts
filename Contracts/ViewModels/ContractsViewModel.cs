@@ -140,6 +140,7 @@ namespace Contracts.ViewModels
                 TermsOfPayment = context.TermsOfPayment,
                 Clients = context.Clients,
                 BlackListClients = context.BlackListCompanies,
+                TechnicalConditions = context.TechnicalConditions,
             };
             return ContractsData;
         }
@@ -203,13 +204,13 @@ namespace Contracts.ViewModels
             try
             {
                 JSONContractModel jsonContract = JsonConvert.DeserializeObject<JSONContractModel>(dataItem.ToString());
-                var client = context.Clients.Where(c => c.FullName == jsonContract.ClientName).FirstOrDefault();
+                //var client = context.Clients.Where(c => c.FullName == jsonContract.ClientName).FirstOrDefault();
                 var existedContract = context.Contracts.Where(ct => ct.id == jsonContract.id).FirstOrDefault();
-                if (client == null)
-                {
-                    context.Clients.Add(new Clients() { name = jsonContract.ClientName });
-                    context.SaveChanges();
-                }
+                //if (client == null)
+                //{
+                //    context.Clients.Add(new Clients() { name = jsonContract.ClientName });
+                //    context.SaveChanges();
+                //}
                 Model.Contracts contract = new Model.Contracts()
                 {
                     Amount = Convert.ToDouble(jsonContract.Amount),
@@ -263,16 +264,16 @@ namespace Contracts.ViewModels
                     existedContract.PaymentDelay = jsonContract.PaymentDelay;
                     existedContract.PaymentDelayDayType = jsonContract.PaymentDelayDayType;
                     existedContract.ContractAcceptedBy = jsonContract.ContractAcceptedBy;
-                    if (existedContract.SignatureMark)
-                    {
-                        existedContract.DayToPlan = DateTime.Now;
-                    }
                     if (jsonContract.SignDate != "" && jsonContract.SignDate != null)
                     {
                         existedContract.SignDate = Convert.ToDateTime(jsonContract.SignDate);
                         existedContract.ReadyMark = jsonContract.ReadyMark;
                         existedContract.SignatureMark = jsonContract.SignatureMark;
                         existedContract.SawContract = jsonContract.SawContract;
+                        if (jsonContract.SignatureMark && existedContract.DayToPlan == DateTime.MinValue)
+                        {
+                            existedContract.DayToPlan = DateTime.Now;
+                        }
                     }
                     return UpdateContract(existedContract);
                 }
@@ -281,7 +282,7 @@ namespace Contracts.ViewModels
                     return new KeyValuePair<bool, int>(false, 0);
                 }
                 else if (contractID == 0 && contract.id == 0)
-                {
+                {   
                     context.Contracts.Add(contract);
                     context.SaveChanges();
                     int createdContractId = context.Contracts.Max(cid => cid.id);

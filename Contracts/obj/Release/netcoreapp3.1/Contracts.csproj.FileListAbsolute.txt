@@ -213,3 +213,4 @@ C:\Projects\Contracts\Contracts\bin\Release\netcoreapp3.1\runtimes\win-x64\nativ
 C:\Projects\Contracts\Contracts\bin\Release\netcoreapp3.1\runtimes\win-x86\native\libSkiaSharp.dll
 C:\Projects\Contracts\Contracts\bin\Release\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Cng.dll
 C:\Projects\Contracts\Contracts\obj\Release\netcoreapp3.1\Contracts.csproj.Up2Date
+C:\Projects\Contracts\Contracts\obj\Release\netcoreapp3.1\Contracts.sourcelink.json

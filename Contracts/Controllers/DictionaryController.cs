@@ -16,6 +16,24 @@ namespace Contracts.Controllers
         }
 
         [HttpGet]
+        public Object GetTechnicalConditions(int tcId = 0)
+        {
+            return Status(new TechnicalConditionsViewModel(db).GetTechnicalConditions(tcId));
+        }
+
+        [HttpPost]
+        public Object CreateTechnicalConditions([FromBody] Object dataItem, int tcId = 0)
+        {
+            return Status(new TechnicalConditionsViewModel(db).CreateTechnicalConditions(dataItem, tcId));
+        }
+
+        [HttpDelete]
+        public void DeleteTechnicalConditions(int tcId)
+        {
+            Status(new TechnicalConditionsViewModel(db).DeleteTechnicalConditions(tcId));
+        }
+
+        [HttpGet]
         public Object IndResponsiblePerson()
         {
             return Status(new DictionaryViewModel(db, Configuration).GetIndelResponsiblePerson());
